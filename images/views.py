@@ -8,6 +8,11 @@ from images.forms import ImageCreateForm
 from images.models import Image
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import HttpResponse
+from actions.utils import create_action
+import redis
+from django.conf import settings
+
+r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
 
 
 @login_required
@@ -22,6 +27,7 @@ def image_create(request):
             # assign current user to the item
             new_image.user = request.user
             new_image.save()
+            create_action(request.user, "bookmarked image", new_image)
             messages.success(request, "Image added successfully")
             # redirect to new created image detail view
             return redirect(new_image.get_absolute_url())
@@ -37,7 +43,25 @@ def image_create(request):
 
 def image_detail(request, id, slug):
     image = get_object_or_404(Image, id=id, slug=slug)
-    return render(request, "images/image/detail.html", {"section": "images", "image": image})
+    total_views = r.incr(f"image:{image.pk}:views")
+    r.zincrby("image_ranking", 1, image.pk)
+    return render(
+        request,
+        "images/image/detail.html",
+        {"section": "images", "image": image, "total_views": total_views},
+    )
+
+
+@login_required
+def image_ranking(request):
+    image_ranking = r.zrange('image_ranking', 0, -1, desc=True)[:10] #type:ignore
+    image_ranking_ids = [int(id) for id in image_ranking]
+
+    most_viewed = list(Image.objects.filter(id__in=image_ranking_ids))
+
+    most_viewed.sort(key=lambda x: image_ranking_ids.index(x.pk))
+    return render(request, 'images/image/ranking.html', {'section': 'images', 'most_viewed': most_viewed})
+
 
 @login_required
 @require_POST
@@ -49,14 +73,14 @@ def image_like(request):
             image = Image.objects.get(id=image_id)
             if action == "like":
                 image.users_like.add(request.user)
+                create_action(request.user, "likes", image)
             else:
                 image.users_like.remove(request.user)
             return JsonResponse({"status": "ok"})
         except Image.DoesNotExist:
             pass
-    
-    return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)
 
+    return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)
 
 
 @login_required
