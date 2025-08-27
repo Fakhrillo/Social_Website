@@ -8,7 +8,7 @@ This is **Version 1**, featuring a simple design, improved search, and a cleaner
 ## 🛠 Prerequisites
 
 - Git (optional, for cloning)
-
+- Redis
 ---
 
 ## 🚀 Quick Start
