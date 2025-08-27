@@ -1,54 +1,67 @@
 #bookmarklet {
-    background:#fff;
-    border-bottom:8px solid #12c064;
-    font-family:"Helvetica Neue", helvetica, arial, sans-serif !important;
-    padding:10px; overflow:auto;
-    box-shadow:0px 0px 8px 0 #666;
-    position:fixed;
-    width:400px;
-    min-height:200px;
-    top:10px;
-    right:10px;
-    z-index:1000000000000;
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  width: 380px;
+  min-height: 200px;
+  padding: 1rem;
+  background: #fff;
+  border-bottom: 6px solid var(--primary, #12c064);
+  border-radius: 0.75rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  font-family: var(--font-main, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif);
+  z-index: 1000000;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  animation: fadeIn 0.3s ease-out;
 }
 
 #bookmarklet h1 {
-    font-family:"Helvetica Neue", helvetica, arial, sans-serif;
-    font-weight:normal;
-    color:#333;
-    font-size:18px;
-    padding:4px 0 20px 0;
- }
-
-#bookmarklet #close {
-    float:right;
-    font-size:18px;
-    text-decoration:none;
-    color:#666;
-    margin-top:-6px;
+  font-family: var(--font-heading, "Muli", sans-serif);
+  font-weight: 600;
+  color: #333;
+  font-size: 1.1rem;
+  margin: 0;
 }
 
+#bookmarklet #close {
+  margin-left: auto;
+  font-size: 1.25rem;
+  text-decoration: none;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
 #bookmarklet #close:hover {
-    color:#000;
+  color: #000;
 }
 
 #bookmarklet .images {
-    margin-bottom:20px;
-    overflow:auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 #bookmarklet .images img {
-    border:1px solid #ccc;
-    padding:2px;
-    margin:2px;
-    opacity:0.8;
-    width:90px;
-    float:left;
-    cursor: pointer;
+  width: 90px;
+  border: 2px solid #ddd;
+  border-radius: 0.5rem;
+  object-fit: cover;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: all 0.2s ease;
+}
+#bookmarklet .images img:hover,
+#bookmarklet .images img.selected {
+  border-color: var(--primary, #12c064);
+  opacity: 1;
+  transform: scale(1.05);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
 }
 
-#bookmarklet .images img.selected,
-#bookmarklet .images img:hover {
-    border:1px solid #12c064;
-    opacity:1;
+/* Simple entry animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
